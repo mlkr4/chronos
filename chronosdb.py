@@ -8,10 +8,10 @@ class DBAction:
         try:
             config = confighelper.read_config()
             self.mydb = mariadb.connect(
-            host=config.["DB"]["host"],
-            user=config.["DB"]["user"],
-            password=config.["DB"]["password"],
-            database=config.["DB"]["database"]
+            host=config["DB"]["host"],
+            user=config["DB"]["user"],
+            password=config["DB"]["password"],
+            database=config["DB"]["database"]
             )
             #return mydb
         except mariadb.Error as e:
