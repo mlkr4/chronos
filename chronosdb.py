@@ -76,12 +76,61 @@ class DBAction:
         except mariadb.Error as e:
             logging.error("chronosdb InsertPresence: error: {e}")
 
+    def CheckSrvState(self):
+        tableName = self.config["DB"]["servertable"]
+        result = False
+        cur = self.mydb.cursor()
+        logging.debug("chronosdb CheckState: built query: SELECT status FROM {a} ORDER BY timestamp DESC LIMIT 1".format(a = tableName))
+        cur.execute("SELECT status FROM {a} ORDER BY timestamp DESC LIMIT 1".format(a = tableName))
+        response = cur.fetchall()
+        logging.debug("chronosdb CheckState: query response caught: {a}".format(a = response))
+        for row in response:
+            if row[0] == "ON":
+                logging.debug("chronosdb CheckState: found active state, setting result = true")
+                result = True
+            elif row[0] == "OFF":
+                logging.debug("chronosdb CheckState: found active state, setting result = false")
+                result = False
+            else:
+                logging.error("chronosdb CheckState: found unknown state, setting result = false")
+                result = False
+        logging.info("chronosdb CheckState: returning {a}".format(a = result))
+        return result
+
+    def InsertSrvState(self, status, event):
+        logging.debug("chronosdb InsertSrvState: input parameters status = {a}, event = {b}".format(a = status, b = event))
+        tableName = self.config["DB"]["servertable"]
+        if status.upper() == "ON":
+            insStatus = "ON"
+        elif status.upper() == "OFF":
+            insStatus = "OFF"
+        else:
+            logging.error("chronosdb InsertSrvState: invalid status presented: {a}, given by event: {b}".format(a = status, b = state))
+            event = "Invalid status"
+            if CheckSrvState():
+                logging.error("chronosdb InsertSrvState: reverting to previous status: ON")
+                insStatus = "ON"
+            else:
+                logging.error("chronosdb InsertSrvState: reverting to previous status: OFF")
+                insStatus = "OFF"
+        cur = self.mydb.cursor()
+        try:
+            logging.debug("chronosdb InsertSrvState: built query: INSERT INTO {a} (status, event) VALUES ('{b}', '{c}')".format(a = tableName, b = insStatus, c = event))
+            cur.execute("INSERT INTO {a} (status, event) VALUES ('{b}', '{c}')".format(a = tableName, b = insStatus, c = event))
+            self.mydb.commit()
+            logging.info("chronosdb InsertSrvState: {a} record inserted.".format(a = cur.rowcount))
+        except mariadb.Error as e:
+            logging.error("chronosdb InsertSrvState: error: {e}")
+
+
 if __name__ == '__main__':
     logging.info("chronosdb started")
     db = DBAction()
     print("[I]nitDatabase")
     print("[C]heck presence")
     print("Insert [P]resence")
+    print("C[H]eck server state")
+    print("I[N]sert server state")
     action = input("Your choice? ").upper()
     if action == "I":
         db.InitDatabase()
@@ -92,5 +141,10 @@ if __name__ == '__main__':
     elif action == "P":
         db.InsertPresence(0)
         print("done")
+    elif action == "H":
+        db.CheckSrvState()
+        print("done")
+    elif action == "N":
+        db.InsertSrvState("off", "chronosdb dry run")
     db.Close()
     logging.info("chronosdb finished")
