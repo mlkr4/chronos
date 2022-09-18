@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(filename='event.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
+logging.info("network-scan started")
+
 import nmap
 import chronosdb, confighelper
 
@@ -19,9 +24,10 @@ for x in range(45):
                 # print(host+' : '+nm[host]['addresses']['mac'])
                 if mac == nm[host]['addresses']['mac']:
                     macQuery = 1
-                    print(mac + " : found in " + nm[host]['addresses']['mac'] + ", macQuery = " + str(macQuery))
+                    logging.debug("Loop "+ str(x) +": "+ mac + " : found in " + nm[host]['addresses']['mac'] + ", macQuery = " + str(macQuery))
 
-print("Final macQuery: ", macQuery)
+logging.info("network-scan: final macQuery: " + str(macQuery))
 db = chronosdb.DBAction()
 db.InsertPresence(macQuery)
 db.Close()
+logging.info("network-scan finished")

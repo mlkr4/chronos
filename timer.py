@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 from datetime import datetime
-import socket, struct, os, logging, subprocess
+import socket, struct, os, subprocess
+import logging
 
 logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(filename='event.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
@@ -108,13 +109,13 @@ def Startup():
     wol = Waker()
     wol.wake(serverMac)
     UpdateStateDB("hostUP", True)
-    logging.event("Startup: WoL sequence complete")
+    logging.info("Startup: WoL sequence complete")
 
 def Shutdown():
     #send shutdown pres ssh, zapis do DB
     if subprocess.Popen(f"ssh -i{rsaCertificate} chronos@{serverIP} sudo poweroff", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate():
         UpdateStateDB("hostUP", False)
-        logging.event("Shutdown: shutdown sequence complete")
+        logging.info("Shutdown: shutdown sequence complete")
     else
         logging.error("Shutdown: shutdown sequence failed")
 
@@ -131,17 +132,17 @@ if __name__ == '__main__':
     if PowerState():
         if PresenceState():
             if SurpressPoweron():
-                logging.event("Calling shutdown sequence based on SurpressPoweron")
+                logging.info("Calling shutdown sequence based on SurpressPoweron")
                 Shutdown()
             else:
                 logging.debug("No PWR change based on PowerState, PresenceState, !SurpressPoweron")
         else:
-            logging.event("Calling shutdown sequence based on PresenceState")
+            logging.info("Calling shutdown sequence based on PresenceState")
             Shutdown()
     else:
         if PresenceState():
             if not SurpressPoweron():
-                logging.event("Calling startup sequence based on PresenceState and !SurpressPoweron")
+                logging.info("Calling startup sequence based on PresenceState and !SurpressPoweron")
                 Startup()
             else:
                 logging.debug("No PWR change based on !PowerState, PresenceState, SurpressPoweron")
