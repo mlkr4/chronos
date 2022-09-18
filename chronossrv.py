@@ -44,7 +44,7 @@ class Server():
     #     self.SendPacket(self.packet, destIP, destPort)
     #     print('Packet successfully sent to', macAddress)
 
-    def Wake(self, serverIP, macAddress, destPort=7):
+    def Wake(self, macAddress, destIP, destPort=7):
         logging.debug('chronossrv: Server.Wake(): initializing.')
         self.MakeMagicPacket(macAddress)
         self.SendPacket(self.packet, destIP, destPort)
