@@ -4,7 +4,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(filename='event.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 
-import socket, struct, subprocess, os
+import socket, struct, subprocess
 import confighelper, chronosdb
 
 config = confighelper.read_config()
@@ -43,7 +43,7 @@ class Server():
         logging.debug('chronossrv: Server.Wake(): initializing.')
         self.MakeMagicPacket(macAddress)
         self.SendPacket(self.packet, serverIP, destPort)
-        logging.info('chronossrv: Server.Wake(): Packet successfully sent to' + macAddress)
+        logging.info('chronossrv: Server.Wake(): Packet successfully sent to ' + macAddress)
         db = chronosdb.DBAction()
         db.InsertSrvState(True, "WoL packet sent")
         db.Close()
