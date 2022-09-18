@@ -33,22 +33,26 @@ class Server():
 
         self.packet = b'\xff' * 6 + hexMac * 16 #create the magic packet from MAC address
 
-    def SendPacket(self, packet, serverIP, destPort = 7):
+    def SendPacket(self, packet, destIP, destPort = 7):
         # Create the socket connection and send the packet
         s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.sendto(packet,(serverIP,destPort))
+        s.sendto(packet,(destIP,destPort))
         s.close()
+
+    # def Wake(self, macAddress, destIP, destPort=7):
+    #     self.MakeMagicPacket(macAddress)
+    #     self.SendPacket(self.packet, destIP, destPort)
+    #     print('Packet successfully sent to', macAddress)
 
     def Wake(self, serverIP, macAddress, destPort=7):
         logging.debug('chronossrv: Server.Wake(): initializing.')
         self.MakeMagicPacket(macAddress)
-        self.SendPacket(self.packet, serverIP, destPort)
-        logging.info('chronossrv: Server.Wake(): Packet successfully sent to ' + macAddress)
+        self.SendPacket(self.packet, destIP, destPort)
+        logging.info("chronossrv: Server.Wake(): Packet successfully sent to " + macAddress)
         db = chronosdb.DBAction()
         db.InsertSrvState(True, "WoL packet sent")
         db.Close()
         logging.debug('chronossrv: Server.Wake(): Database updated.')
-
 
     def Poweroff(self, serverIP, serverAcc, rsaCertificate):
             logging.debug('chronossrv: Server.Poweroff(): initializing.')
