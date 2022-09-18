@@ -97,22 +97,9 @@ class DBAction:
     def InsertSrvState(self, status, event):
         logging.debug("chronosdb InsertSrvState: input parameters status = {a}, event = {b}".format(a = status, b = event))
         tableName = self.config["DB"]["servertable"]
-        # if status.upper() == "ON":
-        #     insStatus = "ON"
-        # elif status.upper() == "OFF":
-        #     insStatus = "OFF"
-        # else:
-        #     logging.error("chronosdb InsertSrvState: invalid status presented: {a}, given by event: {b}".format(a = status, b = state))
-        #     event = "Invalid status"
-        #     if CheckSrvState():
-        #         logging.error("chronosdb InsertSrvState: reverting to previous status: ON")
-        #         insStatus = "ON"
-        #     else:
-        #         logging.error("chronosdb InsertSrvState: reverting to previous status: OFF")
-        #         insStatus = "OFF"
         cur = self.mydb.cursor()
         try:
-            logging.debug("chronosdb InsertSrvState: built query: INSERT INTO {a} (status, event) VALUES (?, ?)".format(a = tableName), (status, event))
+            logging.debug("chronosdb InsertSrvState: built query: INSERT INTO {a} (status, event) VALUES ({b}, {c})".format(a = tableName, b = status, c = event))
             cur.execute("INSERT INTO {a} (status, event) VALUES (?, ?)".format(a = tableName), (status, event))
             self.mydb.commit()
             logging.info("chronosdb InsertSrvState: {a} record inserted.".format(a = cur.rowcount))
