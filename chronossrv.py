@@ -51,7 +51,7 @@ class Server():
 
     def Ping(self, serverIP):
         logging.debug("chronossrv: Ping: initializing")
-        hostUp = True if os.system("ping -c 1 " + serverIP) is 0 else False
+        hostUp = True if os.system("ping -c 1 " + serverIP) == 0 else False
         if hostUp:
             logging.info("chronossrv: Ping: host is up, returning true")
             return True
