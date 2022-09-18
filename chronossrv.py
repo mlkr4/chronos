@@ -88,7 +88,7 @@ if __name__ == '__main__':
     print("P[I]ng")
     action = input('Your choice? ').upper()
     if action == 'W':
-        server.Wake(serverIP, serverMac)
+        server.Wake(serverMac, serverIP)
     elif action == 'P':
         server.Poweroff(serverIP, serverAcc, rsaCertificate)
     elif action == "I":
