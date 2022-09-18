@@ -10,14 +10,15 @@ import confighelper, chronosdb
 config = confighelper.read_config()
 
 class Server():
-    def __init__(self, serverIP):
-        logging.debug("chronossrv: Server init")
-        serverState = self.Ping(serverIP)
-        db = chronosdb.DBAction()
-        if not (serverState == db.CheckSrvState()):
-            logging.warning("chronossrv: Server init: inconsistency in server DB state, fixing")
-            db.InsertSrvState(serverState, "Status fixed by server constructor")
-        db.Close()
+    # def __init__(self, serverIP):
+    #     logging.debug("chronossrv: Server init")
+    #     serverState = self.Ping(serverIP)
+    #     db = chronosdb.DBAction()
+    #     if not (serverState == db.CheckSrvState()):
+    #         logging.warning("chronossrv: Server init: inconsistency in server DB state, fixing")
+    #         db.InsertSrvState(serverState, "Status fixed by server constructor")
+    #     db.Close()
+    #     logging.debug("chronossrv: Server init complete")
 
     def MakeMagicPacket(self, macAddress):
         # Take the entered MAC address and format it to be sent via socket
@@ -33,22 +34,21 @@ class Server():
 
         self.packet = b'\xff' * 6 + hexMac * 16 #create the magic packet from MAC address
 
-    def SendPacket(self, packet, serverIP, destPort = 7):
+    def SendPacket(self, packet, destIP, destPort = 7):
         # Create the socket connection and send the packet
         s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.sendto(packet,(serverIP,destPort))
+        s.sendto(packet,(destIP,destPort))
         s.close()
 
-    def Wake(self, serverIP, macAddress, destPort=7):
+    def Wake(self, macAddress, destIP, destPort=7):
         logging.debug('chronossrv: Server.Wake(): initializing.')
         self.MakeMagicPacket(macAddress)
-        self.SendPacket(self.packet, serverIP, destPort)
-        logging.info('chronossrv: Server.Wake(): Packet successfully sent to' + macAddress)
+        self.SendPacket(self.packet, destIP, destPort)
+        logging.info("chronossrv: Server.Wake(): Packet successfully sent to " + macAddress)
         db = chronosdb.DBAction()
         db.InsertSrvState(True, "WoL packet sent")
         db.Close()
         logging.debug('chronossrv: Server.Wake(): Database updated.')
-
 
     def Poweroff(self, serverIP, serverAcc, rsaCertificate):
             logging.debug('chronossrv: Server.Poweroff(): initializing.')
@@ -78,13 +78,13 @@ if __name__ == '__main__':
     serverMac = config["Server"]["Mac"]
     serverAcc = config["Server"]["username"]
     rsaCertificate = config["Server"]["rsaCertificate"]
-    server = Server(serverIP)
+    server = Server()
     print('[W]ake on lan')
     print('[P]oweroff')
     print("P[I]ng")
     action = input('Your choice? ').upper()
     if action == 'W':
-        server.Wake(serverIP, serverMac)
+        server.Wake(serverMac, serverIP)
     elif action == 'P':
         server.Poweroff(serverIP, serverAcc, rsaCertificate)
     elif action == "I":
