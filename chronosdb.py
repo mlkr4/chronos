@@ -112,8 +112,8 @@ class DBAction:
         #         insStatus = "OFF"
         cur = self.mydb.cursor()
         try:
-            logging.debug("chronosdb InsertSrvState: built query: INSERT INTO {a} (status, event) VALUES ('{b}', '{c}')".format(a = tableName, b = status, c = event))
-            cur.execute("INSERT INTO {a} (status, event) VALUES ('{b}', '{c}')".format(a = tableName, b = status, c = event))
+            logging.debug("chronosdb InsertSrvState: built query: INSERT INTO {a} (status, event) VALUES (?, ?)".format(a = tableName), (status, event))
+            cur.execute("INSERT INTO {a} (status, event) VALUES (?, ?)".format(a = tableName), (status, event))
             self.mydb.commit()
             logging.info("chronosdb InsertSrvState: {a} record inserted.".format(a = cur.rowcount))
         except mariadb.Error as e:
