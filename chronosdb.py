@@ -5,13 +5,13 @@ import confighelper
 
 class DBAction:
     def __init__(self):
+        self.config = confighelper.read_config()
         try:
-            config = confighelper.read_config()
             self.mydb = mariadb.connect(
-            host=config["DB"]["host"],
-            user=config["DB"]["user"],
-            password=config["DB"]["password"],
-            database=config["DB"]["database"]
+            host=self.config["DB"]["host"],
+            user=self.config["DB"]["user"],
+            password=self.config["DB"]["password"],
+            database=self.config["DB"]["database"]
             )
             #return mydb
         except mariadb.Error as e:
@@ -31,22 +31,27 @@ class DBAction:
     def InitDatabase(self):
         cur = self.mydb.cursor()
         try:
-            tableName = config["DB"]["presencetable"]
-            cur.execute("CREATE TABLE IF NOT EXISTS {tableName} ( `timestamp` TIMESTAMP on update CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `state` TINYINT(1) NOT NULL , UNIQUE (`timestamp`)) ")
-        except mydb.Error as e:
+            tableName = self.config["DB"]["presencetable"]
+            query = "CREATE TABLE IF NOT EXISTS " + tableName + " (timestamp TIMESTAMP on update CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , state TINYINT(1) NOT NULL , UNIQUE (timestamp))"
+            cur.execute(query)
+            self.mydb.commit()
+        except mariadb.Error as e:
             print(f"Error creating table: {e}")
         try:
-            tableName = config["DB"]["servertable"]
-            cur.execute("CREATE TABLE IF NOT EXISTS {tableName} ( `timestamp` TIMESTAMP on update CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `status` TINYTEXT NOT NULL , `event` TEXT NOT NULL , UNIQUE (`timestamp`))")
-        except mydb.Error as e:
+            tableName = self.config["DB"]["servertable"]
+            query = "CREATE TABLE IF NOT EXISTS " + tableName + " (timestamp TIMESTAMP on update CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , status TINYTEXT NOT NULL , event TEXT NOT NULL , UNIQUE (timestamp))"
+            cur.execute(query)
+            self.mydb.commit()
+        except mariadb.Error as e:
             print(f"Error creating table: {e}")
 
     def CheckPresence(self):
-        tableName = config["DB"]["presencetable"]
+        tableName = self.config["DB"]["presencetable"]
         data = tuple()
         result = 0
         cur = self.mydb.cursor()
-        cur.execute('SELECT state FROM {tableName} ORDER BY timestamp DESC LIMIT 4')
+        query = "SELECT state FROM " + tableName + " ORDER BY timestamp DESC LIMIT 4"
+        cur.execute(query)
         sql = cur.fetchall()
         print(sql)
         for row in sql:
@@ -60,10 +65,11 @@ class DBAction:
         else: return True
 
     def InsertPresence(self, presence):
-        tableName = config["DB"]["presencetable"]
+        tableName = self.config["DB"]["presencetable"]
         cur = self.mydb.cursor()
         try:
-            cur.execute("INSERT INTO {tableName} (state) VALUES (?)", (presence))
+            query = "INSERT INTO " + tableName + " (state) VALUES (" + str(presence) + ")"
+            cur.execute(query)
             self.mydb.commit()
             print(cur.rowcount, "record inserted.")
         except mariadb.Error as e:
