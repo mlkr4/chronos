@@ -85,14 +85,11 @@ class DBAction:
         response = cur.fetchall()
         logging.debug("chronosdb CheckState: query response caught: {a}".format(a = response))
         for row in response:
-            if row[0] == "ON":
+            if row[0] == 1:
                 logging.debug("chronosdb CheckState: found active state, setting result = true")
                 result = True
-            elif row[0] == "OFF":
+            elif row[0] == 0:
                 logging.debug("chronosdb CheckState: found active state, setting result = false")
-                result = False
-            else:
-                logging.error("chronosdb CheckState: found unknown state, setting result = false")
                 result = False
         logging.info("chronosdb CheckState: returning {a}".format(a = result))
         return result
@@ -100,23 +97,23 @@ class DBAction:
     def InsertSrvState(self, status, event):
         logging.debug("chronosdb InsertSrvState: input parameters status = {a}, event = {b}".format(a = status, b = event))
         tableName = self.config["DB"]["servertable"]
-        if status.upper() == "ON":
-            insStatus = "ON"
-        elif status.upper() == "OFF":
-            insStatus = "OFF"
-        else:
-            logging.error("chronosdb InsertSrvState: invalid status presented: {a}, given by event: {b}".format(a = status, b = state))
-            event = "Invalid status"
-            if CheckSrvState():
-                logging.error("chronosdb InsertSrvState: reverting to previous status: ON")
-                insStatus = "ON"
-            else:
-                logging.error("chronosdb InsertSrvState: reverting to previous status: OFF")
-                insStatus = "OFF"
+        # if status.upper() == "ON":
+        #     insStatus = "ON"
+        # elif status.upper() == "OFF":
+        #     insStatus = "OFF"
+        # else:
+        #     logging.error("chronosdb InsertSrvState: invalid status presented: {a}, given by event: {b}".format(a = status, b = state))
+        #     event = "Invalid status"
+        #     if CheckSrvState():
+        #         logging.error("chronosdb InsertSrvState: reverting to previous status: ON")
+        #         insStatus = "ON"
+        #     else:
+        #         logging.error("chronosdb InsertSrvState: reverting to previous status: OFF")
+        #         insStatus = "OFF"
         cur = self.mydb.cursor()
         try:
-            logging.debug("chronosdb InsertSrvState: built query: INSERT INTO {a} (status, event) VALUES ('{b}', '{c}')".format(a = tableName, b = insStatus, c = event))
-            cur.execute("INSERT INTO {a} (status, event) VALUES ('{b}', '{c}')".format(a = tableName, b = insStatus, c = event))
+            logging.debug("chronosdb InsertSrvState: built query: INSERT INTO {a} (status, event) VALUES ('{b}', '{c}')".format(a = tableName, b = status, c = event))
+            cur.execute("INSERT INTO {a} (status, event) VALUES ('{b}', '{c}')".format(a = tableName, b = status, c = event))
             self.mydb.commit()
             logging.info("chronosdb InsertSrvState: {a} record inserted.".format(a = cur.rowcount))
         except mariadb.Error as e:
@@ -145,6 +142,6 @@ if __name__ == '__main__':
         db.CheckSrvState()
         print("done")
     elif action == "N":
-        db.InsertSrvState("off", "chronosdb dry run")
+        db.InsertSrvState(False, "chronosdb dry run")
     db.Close()
     logging.info("chronosdb finished")
