@@ -6,6 +6,7 @@ import chronosdb, confighelper
 config = confighelper.read_config()
 
 macs = (config["Scanner"]["mac"]).split(",")
+print(macs)
 macQuery = 0
 for x in range(45):
     nm = nmap.PortScanner()
@@ -14,7 +15,7 @@ for x in range(45):
     for host in host_list:
         if  'mac' in nm[host]['addresses']:
             for mac in macs:
-                #print(host+' : '+nm[host]['addresses']['mac'])
+                print(host+' : '+nm[host]['addresses']['mac'])
                 if mac == nm[host]['addresses']['mac']:
                     macQuery = 1
 
