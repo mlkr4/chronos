@@ -10,15 +10,15 @@ import confighelper, chronosdb
 config = confighelper.read_config()
 
 class Server():
-    def __init__(self, serverIP):
-        logging.debug("chronossrv: Server init")
-        serverState = self.Ping(serverIP)
-        db = chronosdb.DBAction()
-        if not (serverState == db.CheckSrvState()):
-            logging.warning("chronossrv: Server init: inconsistency in server DB state, fixing")
-            db.InsertSrvState(serverState, "Status fixed by server constructor")
-        db.Close()
-        logging.debug("chronossrv: Server init complete")
+    # def __init__(self, serverIP):
+    #     logging.debug("chronossrv: Server init")
+    #     serverState = self.Ping(serverIP)
+    #     db = chronosdb.DBAction()
+    #     if not (serverState == db.CheckSrvState()):
+    #         logging.warning("chronossrv: Server init: inconsistency in server DB state, fixing")
+    #         db.InsertSrvState(serverState, "Status fixed by server constructor")
+    #     db.Close()
+    #     logging.debug("chronossrv: Server init complete")
 
     def MakeMagicPacket(self, macAddress):
         # Take the entered MAC address and format it to be sent via socket
