@@ -78,7 +78,7 @@ if __name__ == '__main__':
     serverMac = config["Server"]["Mac"]
     serverAcc = config["Server"]["username"]
     rsaCertificate = config["Server"]["rsaCertificate"]
-    server = Server(serverIP)
+    server = Server()
     print('[W]ake on lan')
     print('[P]oweroff')
     print("P[I]ng")
