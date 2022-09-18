@@ -4,7 +4,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(filename='event.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 
-import socket, struct, subprocess
+import socket, struct, subprocess, os
 import confighelper, chronosdb
 
 config = confighelper.read_config()
@@ -51,7 +51,7 @@ class Server():
 
     def Ping(self, serverIP):
         logging.debug("chronossrv: Ping: initializing")
-        hostUp = True if os.system("ping -c 1 " + serverIP) is 0 else False
+        hostUp = True if os.system("ping -c 1 " + serverIP) == 0 else False
         if hostUp:
             logging.info("chronossrv: Ping: host is up, returning true")
             return True
@@ -103,10 +103,10 @@ if __name__ == '__main__':
     print("P[I]ng")
     action = input('Your choice? ').upper()
     if action == 'W':
-        server.Wake(serverMac)
+        server.Wake(serverIP, serverMac)
     elif action == 'P':
-        server.Poweroff(serverAcc, rsaCertificate)
+        server.Poweroff(serverIP, serverAcc, rsaCertificate)
     elif action == "I":
-        server.Ping()
+        server.Ping(serverIP)
     else:
         print('wrong input')
