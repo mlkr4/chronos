@@ -103,10 +103,10 @@ if __name__ == '__main__':
     print("P[I]ng")
     action = input('Your choice? ').upper()
     if action == 'W':
-        server.Wake(serverMac)
+        server.Wake(serverIP, serverMac)
     elif action == 'P':
-        server.Poweroff(serverAcc, rsaCertificate)
+        server.Poweroff(serverIP, serverAcc, rsaCertificate)
     elif action == "I":
-        server.Ping()
+        server.Ping(serverIP)
     else:
         print('wrong input')
