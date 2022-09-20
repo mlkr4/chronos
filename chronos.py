@@ -4,7 +4,7 @@ import logging
 import confighelper, chronosdb, chronossrv, chronostimer
 
 logging.basicConfig(level=logging.DEBUG)
-logging.basicConfig(filename='event.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(filename='event.log', filemode='w', format='%(asctime)s: %(name)s - %(levelname)s - %(message)s')
 
 if __name__ == '__main__':
 
