@@ -44,7 +44,7 @@ class Server():
     #     db.InsertSrvState(True, "WoL packet sent")
     #     db.Close()
     #     logging.debug('chronossrv: Server.Wake(): Database updated.')
-    def CreateMagicPacket(macaddress: str) -> bytes:
+    def CreateMagicPacket(self, macaddress: str) -> bytes:
         """
         Create a magic packet.
         A magic packet is a packet that can be used with the for wake on lan
@@ -62,7 +62,7 @@ class Server():
         return bytes.fromhex("F" * 12 + macaddress * 16)
     
     
-    def Wake() -> None:
+    def Wake(self) -> None:
         """
         Wake up computers having any of the given mac addresses.
         Wake on lan must be enabled on the host device.
@@ -73,10 +73,10 @@ class Server():
             port: the port of the host to send the magic packet to.
             interface: the ip address of the network adapter to route the magic packet through.
         """
-        ip_address: str = "255.255.255.255",
-        port: int = 9,
-        interface: str = None
-        packet = CreateMagicPacket(self.serverMac)
+        ip_address = "255.255.255.255"
+        port = 9
+        interface = None
+        packet = self.CreateMagicPacket(self.serverMac)
     
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
             if interface is not None:
