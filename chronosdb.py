@@ -64,16 +64,16 @@ class DBAction:
         logging.info("chronosdb CheckPresence: returning {a}".format(a = result))
         return result
 
-    def InsertPresence(self, presence):
+    def InsertPresence(self, state):
         tableName = self.config["DB"]["presencetable"]
         cur = self.mydb.cursor()
         try:
-            logging.debug("chronosdb InsertPresence: built query INSERT INTO {a} (state) VALUES (?), ({b})".format(a = tableName, b = presence))
-            cur.execute("INSERT INTO {a} (state) VALUES (?)".format(a = tableName), (presence))
+            logging.debug("chronosdb InsertPresence: built query INSERT INTO {a} (state) VALUE ({b})".format(a = tableName, b = state))
+            cur.execute("INSERT INTO {a} (state) VALUE (?)".format(a = tableName), (state, ))
             self.mydb.commit()
             logging.info("chronosdb InsertPresence: {a} record inserted.".format(a = cur.rowcount))
         except mariadb.Error as e:
-            logging.error("chronosdb InsertPresence: error: {e}")
+            logging.error("chronosdb InsertPresence: error: {e}".format())
 
     def CheckSrvState(self):
         tableName = self.config["DB"]["servertable"]
@@ -122,7 +122,7 @@ if __name__ == '__main__':
         print("DB: presence state : ")
         db.CheckPresence()
     elif action == "P":
-        db.InsertPresence(0)
+        db.InsertPresence(False)
         print("done")
     elif action == "H":
         db.CheckSrvState()

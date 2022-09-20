@@ -7,6 +7,8 @@ logging.basicConfig(filename='event.log', filemode='w', format='%(asctime)s: %(n
 import os, subprocess, socket, struct, argparse
 import confighelper, chronosdb
 
+from typing import List
+
 class Server():
     def __init__(self, IP, mac, acc, cert):
         logging.debug("chronossrv: Server init")
@@ -62,8 +64,8 @@ class Server():
 
 def main(argv: List[str] = None) -> None:
     logging.debug('chronossrv: main: initializing.')
-    parser = argparse.ArgumentParser(description = "Control configured computer - WoL, shutdown, ping.", formatter_class = argparse.ArgumentDefaultsHelpFormatter,)
-    parser.add_argument(dest = "controlArg", choices=["ping", "shutdown", "verify", "wake"], help = "wake | shutdown | ping | verify", required = True)
+    parser = argparse.ArgumentParser(description = "Control configured computer - WoL, shutdown, ping, verify.", formatter_class = argparse.ArgumentDefaultsHelpFormatter,)
+    parser.add_argument(dest = "controlArg", choices=["ping", "shutdown", "verify", "wake"], help = "wake | shutdown | ping | verify")
     args = parser.parse_args()
     logging.debug('chronossrv: main: arguments parsed: {a}'.format(a = args))
 
