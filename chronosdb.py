@@ -68,9 +68,8 @@ class DBAction:
         tableName = self.config["DB"]["presencetable"]
         cur = self.mydb.cursor()
         try:
-            query = "INSERT INTO " + tableName + " (state) VALUES (" + str(presence) + ")"
-            logging.debug("chronosdb InsertPresence: built query {a}".format(a = query))
-            cur.execute(query)
+            logging.debug("chronosdb InsertPresence: built query INSERT INTO {a} (state) VALUES (?), ({b})".format(a = tableName, b = presence))
+            cur.execute("INSERT INTO {a} (state) VALUES (?)".format(a = tableName), (presence))
             self.mydb.commit()
             logging.info("chronosdb InsertPresence: {a} record inserted.".format(a = cur.rowcount))
         except mariadb.Error as e:
