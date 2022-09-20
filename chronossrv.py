@@ -76,7 +76,7 @@ class Server():
         ip_address = "255.255.255.255"
         port = 9
         interface = None
-        packet = CreateMagicPacket(self.serverMac)
+        packet = self.CreateMagicPacket(self.serverMac)
     
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
             if interface is not None:
