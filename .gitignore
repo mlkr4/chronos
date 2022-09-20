@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 conf.ini
 logging.conf
+.DS_Store
