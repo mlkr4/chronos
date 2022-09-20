@@ -12,6 +12,7 @@ quiesceEndTime = 930
 class Timer():
 	# TBD Holidays, config in conf.ini
 	def SurpressPoweronByDate(self):
+		now = datetime.now()
     	currentTime = 100*now.hour + now.minute
     	currentDay = now.weekday()                     # [0-6] - TBD: CurrentDayEval() - evaluate against holidays
     	if (currentDay <= 3):                         # mon - thu
@@ -43,10 +44,10 @@ class Timer():
     	        return False
 
 	def SurpressPoweron(self):
-	    if SurpressPoweroffByOverride():
+	    if self.SurpressPoweroffByOverride():
 	        logging.debug("SurpressPoweron: SurpressPoweroffByOverride evaluated as true, returning false")
 	        return False
-	    elif SurpressPoweronByDate():
+	    elif self.SurpressPoweronByDate():
 	        logging.debug("SurpressPoweron: SurpressPoweronByDate evaluated as true, returning true")
 	        return True
 	    else:
@@ -57,3 +58,11 @@ class Timer():
 	    # cekni hardlocky proti DB
 	    logging.debug("SurpressPoweroffByOverride: defaulting to false")
 	    return False
+
+if __name__ == '__main__':
+
+	now = datetime.now()
+	query = Timer()
+	print("Time now: {a} on day {b}".format(a = 100*now.hour + now.minute, b = now.weekday()))
+	print("quiesceStartTime - quiesceEndTime set to: {a} - {b}".format(a = quiesceStartTime, b = quiesceEndTime))
+	print("SurpressPoweron returns: {a}.".format(a = query.SurpressPoweron()))

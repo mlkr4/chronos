@@ -44,4 +44,5 @@ class Scanner():
 
 if __name__ == '__main__':
     result = Scanner()
+    print("Running scanner, this may take a while. Works only with sudo privileges btw.")
     print("Found presence: {a}".format(a = result.Scan()))

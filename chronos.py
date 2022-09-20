@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
 
 import logging
-import confighelper, chronosdb, chronossrv, chronostimer
+import confighelper, chronosdb, chronossrv, chronostimer, chronosscan
 
 logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(filename='event.log', filemode='w', format='%(asctime)s: %(name)s - %(levelname)s - %(message)s')
 
+config = confighelper.read_config()
+
 if __name__ == '__main__':
 
-    config = confighelper.read_config()
     serverIP = config["Server"]["IP"]
     serverMac = config["Server"]["Mac"]
     serverAcc = config["Server"]["username"]
     rsaCertificate = config["Server"]["rsaCertificate"]
 
+    scan = chronosscan.Scanner()
+    scan.UpdateDatabase()
     server = chronossrv.Server(serverIP, serverMac, serverAcc, rsaCertificate)
     db = chronosdb.DBAction()
     timer = chronostimer.Timer()
