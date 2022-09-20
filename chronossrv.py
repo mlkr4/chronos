@@ -62,12 +62,7 @@ class Server():
         return bytes.fromhex("F" * 12 + macaddress * 16)
     
     
-    def Wake(
-        mac: str = self.serverMac,
-        ip_address: str = "255.255.255.255",
-        port: int = 9,
-        interface: str = None
-    ) -> None:
+    def Wake() -> None:
         """
         Wake up computers having any of the given mac addresses.
         Wake on lan must be enabled on the host device.
@@ -78,7 +73,10 @@ class Server():
             port: the port of the host to send the magic packet to.
             interface: the ip address of the network adapter to route the magic packet through.
         """
-        packet = CreateMagicPacket(mac)
+        ip_address: str = "255.255.255.255",
+        port: int = 9,
+        interface: str = None
+        packet = CreateMagicPacket(self.serverMac)
     
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
             if interface is not None:
