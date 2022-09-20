@@ -44,7 +44,7 @@ class Server():
     #     db.InsertSrvState(True, "WoL packet sent")
     #     db.Close()
     #     logging.debug('chronossrv: Server.Wake(): Database updated.')
-    def CreateMagicPacket(macaddress: str) -> bytes:
+    def CreateMagicPacket(self, macaddress: str) -> bytes:
         """
         Create a magic packet.
         A magic packet is a packet that can be used with the for wake on lan
