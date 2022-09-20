@@ -112,7 +112,7 @@ class Server():
             logging.info("chronossrv: Server.Ping(): host is down, returning false")
             return False
 
-    def VerifyState(self)
+    def VerifyState(self):
         serverState = self.Ping()
         db = chronosdb.DBAction()
         if not (serverState == db.CheckSrvState()):
