@@ -73,9 +73,9 @@ class Server():
             port: the port of the host to send the magic packet to.
             interface: the ip address of the network adapter to route the magic packet through.
         """
-        ip_address: str = "255.255.255.255",
-        port: int = 9,
-        interface: str = None
+        ip_address = "255.255.255.255"
+        port = 9
+        interface = None
         packet = CreateMagicPacket(self.serverMac)
     
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
