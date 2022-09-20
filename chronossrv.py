@@ -62,7 +62,7 @@ class Server():
         return bytes.fromhex("F" * 12 + macaddress * 16)
     
     
-    def Wake() -> None:
+    def Wake(self) -> None:
         """
         Wake up computers having any of the given mac addresses.
         Wake on lan must be enabled on the host device.
