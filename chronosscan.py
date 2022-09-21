@@ -19,7 +19,7 @@ class Scanner():
         logging.debug("chronosscan: Scanner.Scan() started")
         result = False
         logging.debug("chronosscan: Scanner.Scan() result set to {a}".format(a = result))
-        for x in range(25):
+        for x in range(45):
             nm = nmap.PortScanner()
             nm.scan(hosts=self.config["Scanner"]["subnet"], arguments='-sP')
             host_list = nm.all_hosts()
