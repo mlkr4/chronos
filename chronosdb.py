@@ -73,7 +73,7 @@ class DBAction:
         logging.debug("chronosdb InsertPresence: calling self.CheckPresence, self.presenceRowSum == {a}".format(a = self.presenceRowSum))
         presenceState = self.CheckPresence()
         logging.debug("chronosdb InsertPresence: self.presenceRowSum == {a}".format(a = self.presenceRowSum))
-        if (self.presenceRowSum in range(1,4)) or (state =! presenceState):
+        if (self.presenceRowSum in range(1,4)) or (state is not presenceState):
             logging.debug("chronosdb InsertPresence: (self.presenceRowSum [{a}] in range(1,4)) or (state [{b}] =! presenceState [{c}]) evaluated as TRUE".format(a = self.presenceRowSum, b = state, c = presenceState))
             cur = self.mydb.cursor()
             try:
