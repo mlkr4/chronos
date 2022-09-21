@@ -11,7 +11,7 @@ config = confighelper.read_config()
 def VerifyPresence():
     scanner = chronosscan.Scanner()
     result = scanner.Scan()
-    db = DBAction()
+    db = chronosdb.DBAction()
     db.InsertPresence(result)
     result = db.CheckPresence()
     db.Close()
