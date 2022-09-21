@@ -8,6 +8,15 @@ logging.basicConfig(filename='event.log', filemode='w', format='%(asctime)s: %(n
 
 config = confighelper.read_config()
 
+def VerifyPresence():
+    scanner = chronosscan.Scanner()
+    result = scanner.Scan()
+    db = DBAction()
+    db.InsertPresence(result)
+    result = db.CheckPresence()
+    db.Close()
+    return result
+
 if __name__ == '__main__':
 
     serverIP = config["Server"]["IP"]
@@ -15,32 +24,29 @@ if __name__ == '__main__':
     serverAcc = config["Server"]["username"]
     rsaCertificate = config["Server"]["rsaCertificate"]
 
-    scan = chronosscan.Scanner()
-    scan.UpdateDatabase()
     server = chronossrv.Server(serverIP, serverMac, serverAcc, rsaCertificate)
     db = chronosdb.DBAction()
     timer = chronostimer.Timer()
 
     if server.Ping():
-        if db.CheckPresence():
-            if timer.SurpressPoweron():
-                logging.info("Calling shutdown sequence based on SurpressPoweron")
-                server.Poweroff()
-                db.InsertSrvState(False, "Chronos: SHUTDOWN CALL by SURPRESS")
-            else:
-                logging.debug("No PWR change based on PowerState, PresenceState, !SurpressPoweron")
-        else:
-            logging.info("Calling shutdown sequence based on PresenceState")
+        if timer.SurpressPoweron():
+            logging.info("Calling shutdown sequence based on SurpressPoweron")
+            server.Poweroff()
+            db.InsertSrvState(False, "Chronos: SHUTDOWN CALL by SURPRESS")
+        elif not VerifyPresence():
             server.Poweroff()
             db.InsertSrvState(False, "Chronos: SHUTDOWN CALL by PRESENCE")
+            logging.info("Calling shutdown sequence based on PresenceState")
+        else:
+            logging.debug("No PWR change based on PowerState, PresenceState, !SurpressPoweron")
     else:
-        if db.CheckPresence():
-            if not timer.SurpressPoweron():
+        if not timer.SurpressPoweron():
+            if VerifyPresence():
                 logging.info("Calling startup sequence based on PresenceState and !SurpressPoweron")
                 server.Wake()
                 db.InsertSrvState(True, "Chronos: WAKE CALL by PRESENCE")
             else:
-                logging.debug("No PWR change based on !PowerState, PresenceState, SurpressPoweron")
+                logging.debug("No PWR change based on !PowerState, !PresenceState, !SurpressPoweron")
         else:
-            logging.debug("No PWR change based on !PowerState, !PresenceState")
+            logging.debug("No PWR change based on !SurpressPoweron")
     db.Close()

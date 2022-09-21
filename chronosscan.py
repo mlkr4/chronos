@@ -19,7 +19,7 @@ class Scanner():
         logging.debug("chronosscan: Scanner.Scan() started")
         result = False
         logging.debug("chronosscan: Scanner.Scan() result set to {a}".format(a = result))
-        for x in range(45):
+        for x in range(25):
             nm = nmap.PortScanner()
             nm.scan(hosts=self.config["Scanner"]["subnet"], arguments='-sP')
             host_list = nm.all_hosts()
@@ -31,16 +31,9 @@ class Scanner():
                         if mac == nm[host]['addresses']['mac']:
                             result = True
                             logging.debug("chronosscan: Scanner.Scan() Loop {a}: {b} : found in {c}, result set to {d}".format(a = x, b = mac, c = nm[host]['addresses']['mac'], d = result))
+            if result: break
         logging.info("chronosscan: Scanner.Scan() finished, returning {a}.".format(a = result))
         return result
-
-    def UpdateDatabase(self):
-        logging.debug("chronosscan: Scanner.UpdateDatabase() started")
-        presence = self.Scan()
-        db = chronosdb.DBAction()
-        logging.info("network-scan: Scanner.UpdateDatabase() calling : db.InsertPresence({a})".format(a = presence))
-        db.InsertPresence(presence)
-        db.Close()
 
 if __name__ == '__main__':
     result = Scanner()
