@@ -4,17 +4,22 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(filename='event.log', filemode='w', format='%(asctime)s: %(name)s - %(levelname)s - %(message)s')
 
+import confighelper
+
+config = confighelper.read_config()
+
 from datetime import datetime
 
-quiesceStartTime = 2300
-quiesceEndTime = 930
+quiesceStartTime = int(config["Chronos"]["quiesceStartTime"])
+quiesceEndTime = int(config["Chronos"]["quiesceEndTime"])
 
 class Timer():
     # TBD Holidays, config in conf.ini
     def SurpressPoweronByDate(self):
         now = datetime.now()
         currentTime = 100*now.hour + now.minute
-        currentDay = now.weekday()                     # [0-6] - TBD: CurrentDayEval() - evaluate against holidays
+        currentDay = now.weekday()                    # [0-6] - TBD: CurrentDayEval() - evaluate against holidays
+
         if (currentDay <= 3):                         # mon - thu
             logging.debug("SurpressPoweronByDate: Current day evaluated as MON-THU")
             if ((currentTime <= quiesceEndTime) or (currentTime >= quiesceStartTime)):
