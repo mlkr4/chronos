@@ -10,8 +10,13 @@ config = confighelper.read_config()
 
 from datetime import datetime
 
-quiesceStartTime = int(config["Chronos"]["quiesceStartTime"])
-quiesceEndTime = int(config["Chronos"]["quiesceEndTime"])
+quiesceStartTime = int(config["Timer"]["quiesceStartTime"])
+logging.debug("SurpressPoweronByDate: quiesceStartTime read from config as {a}".format(a = quiesceStartTime))
+quiesceEndTime = int(config["Timer"]["quiesceEndTime"])
+logging.debug("SurpressPoweronByDate: quiesceEndTime read from config as {a}".format(a = quiesceEndTime))
+noPoweroffDay = config["Timer"]["quiesceDays"].split(",")
+noPoweroffDay = [int(s) for s in noPoweroffDay]
+logging.debug("SurpressPoweronByDate: noPoweroffDay read from config as {a}".format(a = noPoweroffDay))
 
 class Timer():
     # TBD Holidays, config in conf.ini
@@ -19,34 +24,65 @@ class Timer():
         now = datetime.now()
         currentTime = 100*now.hour + now.minute
         currentDay = now.weekday()                    # [0-6] - TBD: CurrentDayEval() - evaluate against holidays
+        if not currentDay in noPoweroffDay:
+            logging.debug("SurpressPoweronByDate: Current day ({a}) evaluated as outside of noPoweroffDay ({b})".format(a = currentDay, b = noPoweroffDay))
+            if ((currentDay + 1) in noPoweroffDay) or ((currentDay - 6) in noPoweroffDay):
+                logging.debug("SurpressPoweronByDate: Current day ({a}) evaluated as day before of noPoweroffDay ({b})".format(a = currentDay, b = noPoweroffDay))
+                if (currentTime <= quiesceEndTime):
+                    logging.debug("SurpressPoweronByDate: Quiesce time evaluated as true")            
+                    return True
+                else:
+                    logging.debug("SurpressPoweronByDate: Quiesce time evaluated as false")
+                    return False
+            else:
+                logging.debug("SurpressPoweronByDate: Current day evaluated as not before noPoweroffDay")
+                if ((currentTime <= quiesceEndTime) or (currentTime >= quiesceStartTime)):
+                    logging.debug("SurpressPoweronByDate: Quiesce time evaluated as true")            
+                    return True
+                else: 
+                    logging.debug("SurpressPoweronByDate: Quiesce time evaluated as false")
+                    return False
+        else:
+            logging.debug("SurpressPoweronByDate: Current day ({a}) evaluated as inside of noPoweroffDay ({b})".format(a = currentDay, b = noPoweroffDay))
+            if ((currentDay + 1) in noPoweroffDay) or (currentDay - 6) in noPoweroffDay:
+                logging.debug("SurpressPoweronByDate: Current day evaluated as inside of noPoweroffDay, quiesce time evaluated as false")
+                return False
+            else:
+                logging.debug("SurpressPoweronByDate: Current day evaluated as in the end of noPoweroffDay")
+                if (currentTime >= quiesceStartTime):
+                    logging.debug("SurpressPoweronByDate: Quiesce time evaluated as true")
+                    return True
+                else:
+                    logging.debug("SurpressPoweronByDate: Quiesce time evaluated as false")
+                    return False
 
-        if (currentDay <= 3):                         # mon - thu
-            logging.debug("SurpressPoweronByDate: Current day evaluated as MON-THU")
-            if ((currentTime <= quiesceEndTime) or (currentTime >= quiesceStartTime)):
-                logging.debug("SurpressPoweronByDate: Quiesce time evaluated as true")            
-                return True
-            else: 
-                logging.debug("SurpressPoweronByDate: Quiesce time evaluated as false")
-                return False
-        elif (currentDay == 4):                     # fri OR workday before holiday
-            logging.debug("SurpressPoweronByDate: Current day evaluated as FRI")
-            if (currentTime <= quiesceEndTime):
-                logging.debug("SurpressPoweronByDate: Quiesce time evaluated as true")            
-                return True
-            else:
-                logging.debug("SurpressPoweronByDate: Quiesce time evaluated as false")
-                return False
-        elif (currentDay == 5):
-            logging.debug("SurpressPoweronByDate: Current day evaluated as SAT, quiesce time evaluated as false")
-            return False                             # sat OR holiday before holiday
-        else:                                    # sun OR holiday before workday
-            logging.debug("SurpressPoweronByDate: Current day evaluated as SUN")
-            if (currentTime >= quiesceStartTime):
-                logging.debug("SurpressPoweronByDate: Quiesce time evaluated as true")
-                return True
-            else:
-                logging.debug("SurpressPoweronByDate: Quiesce time evaluated as false")
-                return False
+        # if (currentDay <= 3):                         # mon - thu
+            # logging.debug("SurpressPoweronByDate: Current day evaluated as MON-THU")
+            # if ((currentTime <= quiesceEndTime) or (currentTime >= quiesceStartTime)):
+                # logging.debug("SurpressPoweronByDate: Quiesce time evaluated as true")            
+                # return True
+            # else: 
+                # logging.debug("SurpressPoweronByDate: Quiesce time evaluated as false")
+                # return False
+        # elif (currentDay == 4):                     # fri OR workday before holiday
+            # logging.debug("SurpressPoweronByDate: Current day evaluated as FRI")
+            # if (currentTime <= quiesceEndTime):
+                # logging.debug("SurpressPoweronByDate: Quiesce time evaluated as true")            
+                # return True
+            # else:
+                # logging.debug("SurpressPoweronByDate: Quiesce time evaluated as false")
+                # return False
+        # elif (currentDay == 5):
+            # logging.debug("SurpressPoweronByDate: Current day evaluated as SAT, quiesce time evaluated as false")
+            # return False                             # sat OR holiday before holiday
+        # else:                                    # sun OR holiday before workday
+            # logging.debug("SurpressPoweronByDate: Current day evaluated as SUN")
+            # if (currentTime >= quiesceStartTime):
+                # logging.debug("SurpressPoweronByDate: Quiesce time evaluated as true")
+                # return True
+            # else:
+                # logging.debug("SurpressPoweronByDate: Quiesce time evaluated as false")
+                # return False
 
     def SurpressPoweron(self):
         if self.SurpressPoweroffByOverride():
