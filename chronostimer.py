@@ -19,7 +19,7 @@ noPoweroffDay = [int(s) for s in noPoweroffDay]
 logging.debug("SurpressPoweronByDate: noPoweroffDay read from config as {a}".format(a = noPoweroffDay))
 
 class Timer():
-    # TBD Holidays, config in conf.ini
+    # TBD Holidays - build into init prolly?
     def SurpressPoweronByDate(self):
         now = datetime.now()
         currentTime = 100*now.hour + now.minute
@@ -55,34 +55,6 @@ class Timer():
                 else:
                     logging.debug("SurpressPoweronByDate: Quiesce time evaluated as false")
                     return False
-
-        # if (currentDay <= 3):                         # mon - thu
-            # logging.debug("SurpressPoweronByDate: Current day evaluated as MON-THU")
-            # if ((currentTime <= quiesceEndTime) or (currentTime >= quiesceStartTime)):
-                # logging.debug("SurpressPoweronByDate: Quiesce time evaluated as true")            
-                # return True
-            # else: 
-                # logging.debug("SurpressPoweronByDate: Quiesce time evaluated as false")
-                # return False
-        # elif (currentDay == 4):                     # fri OR workday before holiday
-            # logging.debug("SurpressPoweronByDate: Current day evaluated as FRI")
-            # if (currentTime <= quiesceEndTime):
-                # logging.debug("SurpressPoweronByDate: Quiesce time evaluated as true")            
-                # return True
-            # else:
-                # logging.debug("SurpressPoweronByDate: Quiesce time evaluated as false")
-                # return False
-        # elif (currentDay == 5):
-            # logging.debug("SurpressPoweronByDate: Current day evaluated as SAT, quiesce time evaluated as false")
-            # return False                             # sat OR holiday before holiday
-        # else:                                    # sun OR holiday before workday
-            # logging.debug("SurpressPoweronByDate: Current day evaluated as SUN")
-            # if (currentTime >= quiesceStartTime):
-                # logging.debug("SurpressPoweronByDate: Quiesce time evaluated as true")
-                # return True
-            # else:
-                # logging.debug("SurpressPoweronByDate: Quiesce time evaluated as false")
-                # return False
 
     def SurpressPoweron(self):
         if self.SurpressPoweroffByOverride():
