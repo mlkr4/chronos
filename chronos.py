@@ -28,6 +28,9 @@ if __name__ == '__main__':
     db = chronosdb.DBAction()
     timer = chronostimer.Timer()
 
+    if timer.PresenceCheckBeforePoweron():
+        VerifyPresence()
+
     if server.Ping():
         if timer.SurpressPoweron():
             logging.info("Calling shutdown sequence based on SurpressPoweron")

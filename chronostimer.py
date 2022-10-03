@@ -6,29 +6,36 @@ logging.basicConfig(filename='event.log', filemode='w', format='%(asctime)s: %(n
 
 import confighelper
 
-config = confighelper.read_config()
-
 from datetime import datetime
 
-quiesceStartTime = int(config["Timer"]["quiesceStartTime"])
-logging.debug("SurpressPoweronByDate: quiesceStartTime read from config as {a}".format(a = quiesceStartTime))
-quiesceEndTime = int(config["Timer"]["quiesceEndTime"])
-logging.debug("SurpressPoweronByDate: quiesceEndTime read from config as {a}".format(a = quiesceEndTime))
-noPoweroffDay = config["Timer"]["quiesceDays"].split(",")
-noPoweroffDay = [int(s) for s in noPoweroffDay]
-logging.debug("SurpressPoweronByDate: noPoweroffDay read from config as {a}".format(a = noPoweroffDay))
-
 class Timer():
+    def __init__(self):
+        logging.debug("Timer innit commenced")
+        config = confighelper.read_config()
+        self.now = datetime.now()
+        self.quiesceStartTime = int(config["Timer"]["quiesceStartTime"])
+        logging.debug("Timer: init: quiesceStartTime read from config as {a}".format(a = self.quiesceStartTime))
+        self.quiesceEndTime = int(config["Timer"]["quiesceEndTime"])
+        logging.debug("Timer: init: quiesceEndTime read from config as {a}".format(a = self.quiesceEndTime))
+        self.noPoweroffDay = config["Timer"]["quiesceDays"].split(",")
+        self.noPoweroffDay = [int(s) for s in self.noPoweroffDay]
+        logging.debug("Timer: init: noPoweroffDay read from config as {a}".format(a = self.noPoweroffDay))
+        self.currentTime = 100*self.now.hour + self.now.minute
+        self.currentDay = self.now.weekday()                    # [0-6] - TBD: CurrentDayEval() - evaluate against holidays
+
+    def Report(self):
+        print("Time now: {a} on day {b}".format(a = 100*self.now.hour + self.now.minute, b = self.now.weekday()))
+        print("quiesceStartTime - quiesceEndTime set to: {a} - {b}".format(a = self.quiesceStartTime, b = self.quiesceEndTime))
+        print("SurpressPoweron returns: {a}.".format(a = self.SurpressPoweron()))
+        print("PresenceCheckBeforePoweron returns: {a}".format(a = self.PresenceCheckBeforePoweron()))
+
     # TBD Holidays - build into init prolly?
     def SurpressPoweronByDate(self):
-        now = datetime.now()
-        currentTime = 100*now.hour + now.minute
-        currentDay = now.weekday()                    # [0-6] - TBD: CurrentDayEval() - evaluate against holidays
-        if not currentDay in noPoweroffDay:
-            logging.debug("SurpressPoweronByDate: Current day ({a}) evaluated as outside of noPoweroffDay ({b})".format(a = currentDay, b = noPoweroffDay))
-            if ((currentDay + 1) in noPoweroffDay) or ((currentDay - 6) in noPoweroffDay):
-                logging.debug("SurpressPoweronByDate: Current day ({a}) evaluated as day before of noPoweroffDay ({b})".format(a = currentDay, b = noPoweroffDay))
-                if (currentTime <= quiesceEndTime):
+        if not self.currentDay in self.noPoweroffDay:
+            logging.debug("SurpressPoweronByDate: Current day ({a}) evaluated as outside of noPoweroffDay ({b})".format(a = self.currentDay, b = self.noPoweroffDay))
+            if ((self.currentDay + 1) in self.noPoweroffDay) or ((self.currentDay - 6) in self.noPoweroffDay):
+                logging.debug("SurpressPoweronByDate: Current day ({a}) evaluated as day before of noPoweroffDay ({b})".format(a = self.currentDay, b = self.noPoweroffDay))
+                if (self.currentTime <= self.quiesceEndTime):
                     logging.debug("SurpressPoweronByDate: Quiesce time evaluated as true")            
                     return True
                 else:
@@ -36,20 +43,20 @@ class Timer():
                     return False
             else:
                 logging.debug("SurpressPoweronByDate: Current day evaluated as not before noPoweroffDay")
-                if ((currentTime <= quiesceEndTime) or (currentTime >= quiesceStartTime)):
+                if ((self.currentTime <= self.quiesceEndTime) or (self.currentTime >= self.quiesceStartTime)):
                     logging.debug("SurpressPoweronByDate: Quiesce time evaluated as true")            
                     return True
                 else: 
                     logging.debug("SurpressPoweronByDate: Quiesce time evaluated as false")
                     return False
         else:
-            logging.debug("SurpressPoweronByDate: Current day ({a}) evaluated as inside of noPoweroffDay ({b})".format(a = currentDay, b = noPoweroffDay))
-            if ((currentDay + 1) in noPoweroffDay) or (currentDay - 6) in noPoweroffDay:
+            logging.debug("SurpressPoweronByDate: Current day ({a}) evaluated as inside of noPoweroffDay ({b})".format(a = self.currentDay, b = self.noPoweroffDay))
+            if ((self.currentDay + 1) in self.noPoweroffDay) or (self.currentDay - 6) in self.noPoweroffDay:
                 logging.debug("SurpressPoweronByDate: Current day evaluated as inside of noPoweroffDay, quiesce time evaluated as false")
                 return False
             else:
                 logging.debug("SurpressPoweronByDate: Current day evaluated as in the end of noPoweroffDay")
-                if (currentTime >= quiesceStartTime):
+                if (self.currentTime >= self.quiesceStartTime):
                     logging.debug("SurpressPoweronByDate: Quiesce time evaluated as true")
                     return True
                 else:
@@ -72,10 +79,17 @@ class Timer():
         logging.debug("SurpressPoweroffByOverride: defaulting to false")
         return False
 
+    def PresenceCheckBeforePoweron(self):
+        if self.SurpressPoweronByDate():
+            if (self.quiesceEndTime - 100) <= self.currentTime:
+                return True
+            else:
+                return False
+        else:
+            return False
+
 if __name__ == '__main__':
 
     now = datetime.now()
     query = Timer()
-    print("Time now: {a} on day {b}".format(a = 100*now.hour + now.minute, b = now.weekday()))
-    print("quiesceStartTime - quiesceEndTime set to: {a} - {b}".format(a = quiesceStartTime, b = quiesceEndTime))
-    print("SurpressPoweron returns: {a}.".format(a = query.SurpressPoweron()))
+    query.Report()
