@@ -35,7 +35,7 @@ class Timer():
             logging.debug("SurpressPoweronByDate: Current day ({a}) evaluated as outside of noPoweroffDay ({b})".format(a = self.currentDay, b = self.noPoweroffDay))
             if ((self.currentDay + 1) in self.noPoweroffDay) or ((self.currentDay - 6) in self.noPoweroffDay):
                 logging.debug("SurpressPoweronByDate: Current day ({a}) evaluated as day before of noPoweroffDay ({b})".format(a = self.currentDay, b = self.noPoweroffDay))
-                if (self.currentTime <= self.quiesceEndTime):
+                if (self.currentTime < self.quiesceEndTime):
                     logging.debug("SurpressPoweronByDate: Quiesce time evaluated as true")            
                     return True
                 else:
@@ -43,7 +43,7 @@ class Timer():
                     return False
             else:
                 logging.debug("SurpressPoweronByDate: Current day evaluated as not before noPoweroffDay")
-                if ((self.currentTime <= self.quiesceEndTime) or (self.currentTime >= self.quiesceStartTime)):
+                if ((self.currentTime < self.quiesceEndTime) or (self.currentTime >= self.quiesceStartTime)):
                     logging.debug("SurpressPoweronByDate: Quiesce time evaluated as true")            
                     return True
                 else: 
