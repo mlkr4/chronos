@@ -82,7 +82,7 @@ def main(argv: List[str] = None) -> None:
         computer = Server(serverIP, serverMac, serverAcc, rsaCertificate)
 
         logging.debug("chronossrv: main: initializing DB object.")
-        db = chronosdb.DBAction()
+        db = chronosdb.Databaser()
 
         if args.controlArg == "wake":
             if computer.Wake():

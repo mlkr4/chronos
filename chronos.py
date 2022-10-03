@@ -23,7 +23,7 @@ if __name__ == '__main__':
     rsaCertificate = config["Server"]["rsaCertificate"]
 
     server = chronossrv.Server(serverIP, serverMac, serverAcc, rsaCertificate)
-    db = chronosdb.DBAction()
+    db = chronosdb.Databaser()
     timer = chronostimer.Timer()
 
     if timer.PresenceCheckBeforePoweron():

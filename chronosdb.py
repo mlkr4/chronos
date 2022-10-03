@@ -7,9 +7,9 @@ logging.basicConfig(filename='event.log', filemode='w', format='%(asctime)s: %(n
 import mariadb, sys
 import confighelper
 
-class DBAction:
+class Databaser:
     def __init__(self):
-        logging.debug("chronosdb init: Init started")
+        logging.debug("chronosdb: Databaser init")
         self.config = confighelper.read_config()
         self.presenceRowSum = 0
         try:
@@ -19,14 +19,14 @@ class DBAction:
             password=self.config["DB"]["password"],
             database=self.config["DB"]["database"]
             )
-            logging.info("chronosdb init: MariaDB connect succesfull")
+            logging.info("chronosdb: Databaser init: MariaDB connect succesfull")
         except mariadb.Error as e:
-            logging.error("chronosdb init: Error connecting to MariaDB Platform: {e}")
+            logging.error("chronosdb: Databaser init: Error connecting to MariaDB Platform: {e}")
             sys.exit(1)
 
     def Close(self):
         self.mydb.close()
-        logging.info("chronosdb Close: Succesfully closed MariaDB platform.")
+        logging.info("chronosdb: Databaser Close: Succesfully closed MariaDB platform.")
 
     def InitDatabase(self):
         cur = self.mydb.cursor()
@@ -120,7 +120,7 @@ class DBAction:
 
 if __name__ == '__main__':
     logging.info("chronosdb started")
-    db = DBAction()
+    db = Databaser()
     print("[I]nitDatabase")
     print("[C]heck presence")
     print("Insert [P]resence")
