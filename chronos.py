@@ -8,13 +8,11 @@ logging.basicConfig(filename='event.log', filemode='w', format='%(asctime)s: %(n
 
 config = confighelper.read_config()
 
-def VerifyPresence():
+def VerifyPresence(db):
     scanner = chronosscan.Scanner()
     result = scanner.Scan()
-    db = chronosdb.DBAction()
     db.InsertPresence(result)
     result = db.CheckPresence()
-    db.Close()
     return result
 
 if __name__ == '__main__':
@@ -29,14 +27,14 @@ if __name__ == '__main__':
     timer = chronostimer.Timer()
 
     if timer.PresenceCheckBeforePoweron():
-        VerifyPresence()
+        VerifyPresence(db)
 
     if server.Ping():
         if timer.SurpressPoweron():
             logging.info("Calling shutdown sequence based on SurpressPoweron")
             server.Poweroff()
             db.InsertSrvState(False, "Chronos: SHUTDOWN CALL by SURPRESS")
-        elif not VerifyPresence():
+        elif not VerifyPresence(db):
             server.Poweroff()
             db.InsertSrvState(False, "Chronos: SHUTDOWN CALL by PRESENCE")
             logging.info("Calling shutdown sequence based on PresenceState")
@@ -44,7 +42,7 @@ if __name__ == '__main__':
             logging.debug("No PWR change based on PowerState, PresenceState, !SurpressPoweron")
     else:
         if not timer.SurpressPoweron():
-            if VerifyPresence():
+            if VerifyPresence(db):
                 logging.info("Calling startup sequence based on PresenceState and !SurpressPoweron")
                 server.Wake()
                 db.InsertSrvState(True, "Chronos: WAKE CALL by PRESENCE")
