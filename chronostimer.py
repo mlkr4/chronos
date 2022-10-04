@@ -89,12 +89,18 @@ class Timer():
 
     def PresenceCheckBeforePoweron(self):
         logging.debug("chronostimer: Timer.PresenceCheckBeforePoweron> init")
+        logging.debug("chronostimer: Timer.PresenceCheckBeforePoweron> checking: SurpressPoweronByDate")
         if self.SurpressPoweronByDate():
+            logging.debug("chronostimer: Timer.PresenceCheckBeforePoweron> SurpressPoweronByDate returned True")
+            logging.debug("chronostimer: Timer.PresenceCheckBeforePoweron> checking: quiesceEndTime({a}) - 100 <= currentTime({b})")
             if (self.quiesceEndTime - 100) <= self.currentTime:
                 return True
+                logging.debug("chronostimer: Timer.PresenceCheckBeforePoweron> returning True")
             else:
                 return False
+                logging.debug("chronostimer: Timer.PresenceCheckBeforePoweron> returning False")
         else:
+            logging.debug("chronostimer: Timer.PresenceCheckBeforePoweron> SurpressPoweronByDate returned False, returning False")
             return False
         logging.debug("chronostimer: Timer.PresenceCheckBeforePoweron> fin.")
 
