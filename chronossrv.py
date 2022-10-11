@@ -17,14 +17,14 @@ class Server():
         self.serverAcc = acc
         self.serverCert = cert
 
-    def CreateMagicPacket(self, macaddress: str) -> bytes:
-        logging.debug("chronossrv: Server.CreateMagicPacket> init")
+    def create_magic_packet(self, macaddress: str) -> bytes:
+        logging.debug("chronossrv: Server.create_magic_packet> init")
         if len(macaddress) == 17:
             sep = macaddress[2]
             macaddress = macaddress.replace(sep, "")
         elif len(macaddress) != 12:
             raise ValueError("Incorrect MAC address format")
-        logging.debug("chronossrv: Server.CreateMagicPacket> Fin.")
+        logging.debug("chronossrv: Server.create_magic_packet> Fin.")
         return bytes.fromhex("F" * 12 + macaddress * 16)
 
     def Wake(self):
@@ -32,7 +32,7 @@ class Server():
         ip_address = "255.255.255.255"
         port = 9
         interface = None
-        packet = self.CreateMagicPacket(self.serverMac)
+        packet = self.create_magic_packet(self.serverMac)
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
             if interface is not None:
                 sock.bind((interface, 0))
@@ -53,15 +53,15 @@ class Server():
                 logging.error('chronossrv: Server.Poweroff> Cannot send SSH command, returning False')
                 return False
 
-    def Ping(self):
-        logging.debug("chronossrv: Server.Ping> init")
+    def IsServerUp(self):
+        logging.debug("chronossrv: Server.IsServerUp> init")
         hostUp = True if os.system("ping -c 1 " + self.serverIP) == 0 else False
-        logging.debug("chronossrv: Server.Ping> sent ping -c 1 {serverIP}, evaluated as {hostUP}.")
+        logging.debug("chronossrv: Server.IsServerUp> sent ping -c 1 {serverIP}, evaluated as {hostUP}.")
         if hostUp:
-            logging.info("chronossrv: Server.Ping> host is up, returning True")
+            logging.info("chronossrv: Server.IsServerUp> host is up, returning True")
             return True
         else:
-            logging.info("chronossrv: Server.Ping> host is down, returning False")
+            logging.info("chronossrv: Server.IsServerUp> host is down, returning False")
             return False
 
 def main(argv: List[str] = None) -> None:
@@ -99,12 +99,12 @@ def main(argv: List[str] = None) -> None:
             else:
                 print("Shutdown failed.")
         elif args.controlArg == "ping":
-            if computer.Ping():
+            if computer.IsServerUp():
                 print("Server is alive.")
             else:
                 print("Server unresponsive.")
         elif args.controlArg == "verify":
-            if computer.Ping():
+            if computer.IsServerUp():
                 if not db.CheckSrvState():
                     db.InsertSrvState(True, "Chronossrv.main verify fix")
                     print("Server is alive, DB state inconsistent, fixed")

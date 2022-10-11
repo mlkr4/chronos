@@ -24,9 +24,9 @@ class Databaser:
             logging.error("chronosdb: Databaser.init> Error connecting to MariaDB Platform: {e}")
             sys.exit(1)
 
-    def Close(self):
+    def close_db(self):
         self.mydb.close()
-        logging.info("chronosdb: Databaser.Close> Succesfully closed MariaDB platform.")
+        logging.info("chronosdb: Databaser.close_db> Succesfully closed MariaDB platform.")
 
     def InitDatabase(self):
         logging.debug("chronosdb: Databaser.InitDatabase> init")
@@ -147,5 +147,5 @@ if __name__ == '__main__':
         print("done")
     elif action == "N":
         db.InsertSrvState(False, "chronosdb dry run")
-    db.Close()
+    db.close_db()
     logging.info("chronosdb> fin.")
