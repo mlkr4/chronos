@@ -63,7 +63,7 @@ class Timer():
         return result
 
     def is_tomorrow_workday(self):
-        result = True if ((self.current_day + 1) not in self.no_quiesce_days) or ((self.current_day - 6) not in self.no_quiesce_days) else False
+        result = True if ((self.current_day + 1) not in self.no_quiesce_days) and ((self.current_day - 6) not in self.no_quiesce_days) else False
         logging.debug("chronostimer: Timer.is_tomorrow_workday> returns {a}".format(a = result))
         return result
 
