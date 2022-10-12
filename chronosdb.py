@@ -49,6 +49,15 @@ class Databaser:
             logging.info("chronosdb: Databaser.init_database> servertable commited.")
         except mariadb.Error as e:
             logging.error("chronosdb Databaser.init_database> Error creating table: {e}")
+        try:
+            tableName = self.config["DB"]["holidaytable"]
+            query = "CREATE TABLE IF NOT EXISTS " + tableName + " (timestamp TIMESTAMP on update CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , status TINYTEXT NOT NULL , event TEXT NOT NULL , UNIQUE (timestamp))"
+            logging.debug("chronosdb: Databaser.init_database> built query: " + query)
+            cur.execute(query)
+            self.mydb.commit()
+            logging.info("chronosdb: Databaser.init_database> servertable commited.")
+        except mariadb.Error as e:
+            logging.error("chronosdb Databaser.init_database> Error creating table: {e}")
 
     def get_presence_state(self):
         logging.debug("chronosdb: Databaser.get_presence_state> init")
