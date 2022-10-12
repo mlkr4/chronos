@@ -28,7 +28,12 @@ class Timer():
         logging.debug("chronostimer: Timer.report> init")
         print("Time now: {a} on day {b}".format(a = 100*self.now.hour + self.now.minute, b = self.now.weekday()))
         print("quiesceStartTime - quiesceEndTime set to: {a} - {b}".format(a = self.quiesce_start_time, b = self.quiesce_end_time))
-        print("is_poweron_surpressed_by_date_and_time returns {a}".format(a = is_poweron_surpressed_by_date_and_time()))
+        print("is_poweron_surpressed_by_date_and_time returns {a}".format(a = self.is_poweron_surpressed_by_date_and_time()))
+        print("is_today_workday returns {a}".format(a = self.is_today_workday()))
+        print("is_tomorrow_workday returns {a}".format(a = self.is_tomorrow_workday()))
+        print("is_now_after_quiesce_start_time returns {a}".format(a = self.is_now_after_quiesce_start_time()))
+        print("is_now_before_quiesce_end_time returns {a}".format(a = self.is_now_before_quiesce_end_time()))
+        print("is_now_within_quiesce_time returns {a}".format(a = self.is_now_within_quiesce_time()))
         print("should_server_be_down returns: {a}.".format(a = self.should_server_be_down()))
         print("should_presence_be_got_before_poweron returns: {a}".format(a = self.should_presence_be_got_before_poweron()))
         logging.debug("chronostimer: Timer.report> fin.")
@@ -37,29 +42,40 @@ class Timer():
         logging.debug("chronostimer: Timer.is_poweron_surpressed_by_date_and_time> init")
         result = False
         if self.is_now_within_quiesce_time():
+            logging.debug("chronostimer: Timer.is_poweron_surpressed_by_date_and_time> is_now_within_quiesce_time() == true")
             if self.is_tomorrow_workday():
+                logging.debug("chronostimer: Timer.is_poweron_surpressed_by_date_and_time> is_tomorrow_workday() == true")
                 if self.is_today_workday():
+                    logging.debug("chronostimer: Timer.is_poweron_surpressed_by_date_and_time> is_today_workday() == true; result = True")
                     result = True
                 elif not self.is_now_before_quiesce_end_time():
+                    logging.debug("chronostimer: Timer.is_poweron_surpressed_by_date_and_time> !is_now_before_quiesce_end_time() == true; result = True")
                     result = True
             elif self.is_today_workday() and self.is_now_before_quiesce_end_time():
+                logging.debug("chronostimer: Timer.is_poweron_surpressed_by_date_and_time> is_today_workday() == true and is_now_before_quiesce_end_time == true; result = True")
                 result = True
+        logging.debug("chronostimer: Timer.is_poweron_surpressed_by_date_and_time> returns {a}".format(a = result))
         return result
 
     def is_today_workday(self):
-        return True if not self.current_day in self.no_quiesce_days else False
+        result = True if not self.current_day in self.no_quiesce_days else False
+        logging.debug("chronostimer: Timer.is_today_workday> returns {a}".format(a = result))
+        return result
 
     def is_tomorrow_workday(self):
-        result = False
-        if ((self.current_day + 1) not in self.no_quiesce_days) or (self.current_day - 6) not in self.no_quiesce_days:
-            result = True
+        result = True if ((self.current_day + 1) not in self.no_quiesce_days) or (self.current_day - 6) not in self.no_quiesce_days else False
+        logging.debug("chronostimer: Timer.is_tomorrow_workday> returns {a}".format(a = result))
         return result
 
     def is_now_after_quiesce_start_time(self):
-        return True if self.current_time >= self.quiesce_start_time else False
+        result = True if self.current_time >= self.quiesce_start_time else False
+        logging.debug("chronostimer: Timer.is_now_after_quiesce_start_time> returns {a}".format(a = result))
+        return result
 
     def is_now_before_quiesce_end_time(self):
-        return True if self.current_time <= self.quiesce_end_time else False
+        result = True if self.current_time <= self.quiesce_end_time else False
+        logging.debug("chronostimer: Timer.is_now_before_quiesce_end_time> returns {a}".format(a = result))
+        return result
 
     def is_now_within_quiesce_time(self):
         logging.debug("chronostimer: Timer.is_now_within_quiesce_time> init")
