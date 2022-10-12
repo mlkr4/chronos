@@ -15,10 +15,17 @@ class Scanner():
         self.macs = (self.config["Scanner"]["mac"]).upper().split(",")
         logging.debug("chronosscan: Scanner.init> Querried macs: {a}".format(a = self.macs))
 
+<<<<<<< HEAD
     def Scan(self):
         logging.debug("chronosscan: Scanner.Scan> started")
         result = False
         logging.debug("chronosscan: Scanner.Scan> result set to {a}".format(a = result))
+=======
+    def is_mac_addr_present(self):
+        logging.debug("chronosscan: Scanner.is_mac_addr_present> started")
+        result = False
+        logging.debug("chronosscan: Scanner.is_mac_addr_present> result set to {a}".format(a = result))
+>>>>>>> dev
         for x in range(45):
             nm = nmap.PortScanner()
             nm.scan(hosts=self.config["Scanner"]["subnet"], arguments='-sP')
@@ -30,12 +37,18 @@ class Scanner():
                         # print(host+' : '+nm[host]['addresses']['mac'])
                         if mac == nm[host]['addresses']['mac']:
                             result = True
+<<<<<<< HEAD
                             logging.debug("chronosscan: Scanner.Scan> Loop {a}: {b} : found in {c}, result set to {d}".format(a = x, b = mac, c = nm[host]['addresses']['mac'], d = result))
             if result: break
         logging.info("chronosscan: Scanner.Scan> finished, returning {a}.".format(a = result))
+=======
+                            logging.debug("chronosscan: Scanner.is_mac_addr_present> Loop {a}: {b} : found in {c}, result set to {d}".format(a = x, b = mac, c = nm[host]['addresses']['mac'], d = result))
+            if result: break
+        logging.info("chronosscan: Scanner.is_mac_addr_present> finished, returning {a}.".format(a = result))
+>>>>>>> dev
         return result
 
 if __name__ == '__main__':
     result = Scanner()
     print("Running scanner, this may take a while. Works only with sudo privileges btw.")
-    print("Found presence: {a}".format(a = result.Scan()))
+    print("Found presence: {a}".format(a = result.is_mac_addr_present()))
