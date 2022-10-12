@@ -10,15 +10,15 @@ import chronosdb, confighelper
 
 class Scanner():
     def __init__(self):
-        logging.debug("chronosscan: Scanner.init started")
+        logging.debug("chronosscan: Scanner> init")
         self.config = confighelper.read_config()
         self.macs = (self.config["Scanner"]["mac"]).upper().split(",")
-        logging.debug("chronosscan: Scanner.init: Querried macs: {a}".format(a = self.macs))
+        logging.debug("chronosscan: Scanner.init> Querried macs: {a}".format(a = self.macs))
 
     def Scan(self):
-        logging.debug("chronosscan: Scanner.Scan() started")
+        logging.debug("chronosscan: Scanner.Scan> started")
         result = False
-        logging.debug("chronosscan: Scanner.Scan() result set to {a}".format(a = result))
+        logging.debug("chronosscan: Scanner.Scan> result set to {a}".format(a = result))
         for x in range(45):
             nm = nmap.PortScanner()
             nm.scan(hosts=self.config["Scanner"]["subnet"], arguments='-sP')
@@ -30,9 +30,9 @@ class Scanner():
                         # print(host+' : '+nm[host]['addresses']['mac'])
                         if mac == nm[host]['addresses']['mac']:
                             result = True
-                            logging.debug("chronosscan: Scanner.Scan() Loop {a}: {b} : found in {c}, result set to {d}".format(a = x, b = mac, c = nm[host]['addresses']['mac'], d = result))
+                            logging.debug("chronosscan: Scanner.Scan> Loop {a}: {b} : found in {c}, result set to {d}".format(a = x, b = mac, c = nm[host]['addresses']['mac'], d = result))
             if result: break
-        logging.info("chronosscan: Scanner.Scan() finished, returning {a}.".format(a = result))
+        logging.info("chronosscan: Scanner.Scan> finished, returning {a}.".format(a = result))
         return result
 
 if __name__ == '__main__':
