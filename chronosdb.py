@@ -51,11 +51,11 @@ class Databaser:
             logging.error("chronosdb Databaser.init_database> Error creating table: {e}")
         try:
             tableName = self.config["DB"]["holidaytable"]
-            query = "CREATE TABLE IF NOT EXISTS " + tableName + " (timestamp TIMESTAMP on update CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , status TINYTEXT NOT NULL , event TEXT NOT NULL , UNIQUE (timestamp))"
+            query = "CREATE TABLE IF NOT EXISTS " + tableName + " (id INT NOT NULL AUTO_INCREMENT , start_date DATE NOT NULL , end_date DATE NULL DEFAULT NULL , description VARCHAR(300) NULL DEFAULT NULL , PRIMARY KEY (id))"
             logging.debug("chronosdb: Databaser.init_database> built query: " + query)
             cur.execute(query)
             self.mydb.commit()
-            logging.info("chronosdb: Databaser.init_database> servertable commited.")
+            logging.info("chronosdb: Databaser.init_database> holidaytable commited.")
         except mariadb.Error as e:
             logging.error("chronosdb Databaser.init_database> Error creating table: {e}")
 
@@ -127,6 +127,15 @@ class Databaser:
         except mariadb.Error as e:
             logging.error("chronosdb Databaser.record_server_state> error: {e}")
 
+    def get_immediate_holidays(self, today, tomorrow):
+        tableName = self.config["DB"]["holidaytable"]
+        cur = self.mydb.cursor()
+        query = "SELECT * FROM {a} WHERE (start_date >= {b} AND start_date <= {c}) OR (start_date < {b} AND end_date > {b}) ORDER BY start_date".format(a = tableName, b = today, c = tomorrow)
+        logging.debug("chronosdb: Databaser.CheckState> built query: {a}".format(a = query))
+        cur.execute(query)
+        response = cur.fetchall()
+        for row in response:
+            
 
 if __name__ == '__main__':
     logging.info("chronosdb> main")
