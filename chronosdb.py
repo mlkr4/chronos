@@ -135,6 +135,7 @@ class Databaser:
         cur.execute(query)
         response = cur.fetchall()
         for row in response:
+            print(response)
             
 
 if __name__ == '__main__':
