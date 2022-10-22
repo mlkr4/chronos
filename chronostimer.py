@@ -24,6 +24,21 @@ class Timer():
         self.current_day = self.now.weekday()                    # [0-6] - TBD: CurrentDayEval() - evaluate against holidays
         logging.debug("chronostimer: Timer.init> fin.")
 
+    def todays_date(self):
+        return datetime.today()
+
+    def tomorrows_date(self):
+        return datetime.today() + datetime.timedelta(days = 1)
+
+    def add_no_quiesce_days(self, *args):
+        if "today" in args:
+            if is_today_workday():
+                self.no_quiesce_days.append(self.current_day)
+        if "tomorrow" in args:
+            if is_tomorrow_workday():
+                self.no_quiesce_days.append(self.current_day + 1)
+
+
     def report(self):
         logging.debug("chronostimer: Timer.report> init")
         print("Time now: {a} on day {b}".format(a = 100*self.now.hour + self.now.minute, b = self.now.weekday()))
@@ -73,7 +88,7 @@ class Timer():
         return result
 
     def is_now_before_quiesce_end_time(self):
-        result = True if self.current_time <= self.quiesce_end_time else False
+        result = True if self.current_time < self.quiesce_end_time else False
         logging.debug("chronostimer: Timer.is_now_before_quiesce_end_time> returns {a}".format(a = result))
         return result
 
@@ -123,6 +138,11 @@ class Timer():
             logging.debug("chronostimer: Timer.should_presence_be_got_before_poweron> is_poweron_surpressed_by_date_and_time returned False, returning False")
             return False
         logging.debug("chronostimer: Timer.should_presence_be_got_before_poweron> fin.")
+    
+    def last_week(self):
+
+    def next_week(self):
+
 
 if __name__ == '__main__':
 
