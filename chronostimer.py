@@ -73,7 +73,7 @@ class Timer():
         return result
 
     def is_now_before_quiesce_end_time(self):
-        result = True if self.current_time <= self.quiesce_end_time else False
+        result = True if self.current_time < self.quiesce_end_time else False
         logging.debug("chronostimer: Timer.is_now_before_quiesce_end_time> returns {a}".format(a = result))
         return result
 
