@@ -60,7 +60,6 @@ if __name__ == '__main__':
             logging.info("Chronos> Called shutdown sequence based on verify_home_presence and verify_remote_presence")
         else:
             logging.debug("Chronos> No PWR change based on is_server_up, !should_server_be_down, verify_home_presence(), verify_remote_presence()")
-    elif 
     else:
         logging.debug("Chronos> Server.is_server_up() returned False")
         if verify_remote_presence():
