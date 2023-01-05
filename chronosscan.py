@@ -5,7 +5,7 @@ logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(filename='event.log', filemode='w', format='%(asctime)s: %(name)s - %(levelname)s - %(message)s')
 logging.info("network-scan started")
 
-import nmap
+import nmap, os
 import chronosdb, confighelper
 
 class Scanner():
