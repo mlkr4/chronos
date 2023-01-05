@@ -41,7 +41,7 @@ class Scanner():
         result = False
         for ip in self.ips:
             logging.debug("chronosscan: Scanner.is_ip_addr_present> scanning for {ip}.")
-            if is_ip_addr_up(ip):
+            if self.is_ip_addr_up(ip):
                 result = True
             if result: break
         logging.debug("chronosscan: Scanner.is_ip_addr_present> returning {result}.")
