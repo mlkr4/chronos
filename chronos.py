@@ -50,16 +50,20 @@ if __name__ == '__main__':
     if server.is_server_up():
         logging.debug("Chronos> Server.is_server_up() returned True")
         logging.debug("Chronos> Calling timer.SurpressPoweron() elif verify_home_presence()")
-        if timer.should_server_be_down() and not verify_remote_presence():
-            logging.info("Chronos> Calling shutdown sequence based on should_server_be_down and not verify_remote_presence()")
-            server.shutdown_server()
-            db.record_server_state(False, "Chronos: SHUTDOWN CALL by TIME SURPRESS")
-        elif not verify_home_presence(db) and not verify_remote_presence():
-            server.shutdown_server()
-            db.record_server_state(False, "Chronos: SHUTDOWN CALL by PRESENCE")
-            logging.info("Chronos> Called shutdown sequence based on verify_home_presence and verify_remote_presence")
+        if not server.is_server_locked():
+            if timer.should_server_be_down() and not verify_remote_presence():
+                logging.info("Chronos> Calling shutdown sequence based on should_server_be_down and not verify_remote_presence()")
+                server.shutdown_server()
+                db.record_server_state(False, "Chronos: SHUTDOWN CALL by TIME SURPRESS")
+            elif not verify_home_presence(db) and not verify_remote_presence():
+                server.shutdown_server()
+                db.record_server_state(False, "Chronos: SHUTDOWN CALL by PRESENCE")
+                logging.info("Chronos> Called shutdown sequence based on verify_home_presence and verify_remote_presence")
+            else:
+                logging.debug("Chronos> No PWR change based on is_server_up, !should_server_be_down, verify_home_presence(), verify_remote_presence()")
         else:
-            logging.debug("Chronos> No PWR change based on is_server_up, !should_server_be_down, verify_home_presence(), verify_remote_presence()")
+            logging.debug("Chronos> Server lockfile count, no changes")
+
     else:
         logging.debug("Chronos> Server.is_server_up() returned False")
         if verify_remote_presence():
