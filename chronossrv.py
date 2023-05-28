@@ -16,6 +16,7 @@ class Server():
         self.serverMac = mac
         self.serverAcc = acc
         self.serverCert = cert
+        self.serverLockfile = "/opt/shell-scripts/chronos.lock"
 
     def create_magic_packet(self, macaddress: str) -> bytes:
         logging.debug("chronossrv: Server.create_magic_packet> init")
@@ -64,6 +65,19 @@ class Server():
             logging.info("chronossrv: Server.is_server_up> host is down, returning False")
             return False
 
+    def is_server_locked(self):
+        logging.debug("chronossrv: Server.is_server_locked> init")
+        status = subprocess.call(
+        [f"ssh -i{cert} {usr}@{srv} test -f {path}".format(cert = self.serverCert, usr = self.serverAcc, srv = self.serverIP, path = pipes.quote(self.serverLockfile))])
+        logging.debug(f"chronossrv: Server.is_server_locked> sent ssh -i{cert} {usr}@{srv} test -f {path}".format(cert = self.serverCert, usr = self.serverAcc, srv = self.serverIP, path = pipes.quote(self.serverLockfile)))
+        if status == 0:
+            logging.info("chronossrv: Server.is_server_locked> lockfile found, returning True")
+            return True
+        if status == 1:
+            logging.info("chronossrv: Server.is_server_locked> lockfile not found, returning False")
+            return False
+        raise Exception('SSH failed')
+
 def main(argv: List[str] = None) -> None:
     logging.debug('chronossrv: main> init.')
     parser = argparse.ArgumentParser(description = "Control configured computer - WoL, shutdown, ping, verify.", formatter_class = argparse.ArgumentDefaultsHelpFormatter,)
@@ -110,6 +124,7 @@ def main(argv: List[str] = None) -> None:
                     print("Server is alive, DB state inconsistent, fixed")
                 else:
                     print("Server is alive, DB state consistent")
+                print("Lockfile found") if computer.is_server_locked() else prit("No lockfile")
             else:
                 if db.get_server_state():
                     db.record_server_state(False, "Chronossrv.main verify fix")
