@@ -67,13 +67,7 @@ class Server():
 
     def is_server_locked(self):
         logging.debug("chronossrv: Server.is_server_locked> init")
-        #status = subprocess.call(["ssh -i{cert} {usr}@{srv} test -f {path}".format(cert = self.serverCert, usr = self.serverAcc, srv = self.serverIP, path = shlex.quote(self.serverLockfile))])
-        if subprocess.Popen(f"ssh -i{self.serverCert} {self.serverAcc}@{self.serverIP} test -f {shlex.quote(self.serverLockfile)}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate():
-            logging.debug("chronossrv: is_server_locked> Returning True")
-            return True
-        else:
-            logging.error('chronossrv: is_server_locked> Cannot send SSH command, returning False')
-            return False
+        status = subprocess.call(["ssh", "-i{cert}".format(cert = self.serverCert), "{usr}@{srv}".format(usr = self.serverAcc, srv = self.serverIP), "test -f {path}".format(cert = self.serverCert, usr = self.serverAcc, srv = self.serverIP, path = shlex.quote(self.serverLockfile))])
         logging.debug("chronossrv: Server.is_server_locked> sent ssh -i{cert} {usr}@{srv} test -f {path}".format(cert = self.serverCert, usr = self.serverAcc, srv = self.serverIP, path = shlex.quote(self.serverLockfile)))
         if status == 0:
             logging.info("chronossrv: Server.is_server_locked> lockfile found, returning True")
