@@ -4,7 +4,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(filename='event.log', filemode='w', format='%(asctime)s: %(name)s - %(levelname)s - %(message)s')
 
-import os, subprocess, socket, struct, argparse
+import os, subprocess, socket, struct, argparse, shlex
 import confighelper, chronosdb
 
 from typing import List
