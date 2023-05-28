@@ -123,7 +123,7 @@ def main(argv: List[str] = None) -> None:
                     print("Server is alive, DB state inconsistent, fixed")
                 else:
                     print("Server is alive, DB state consistent")
-                print("Lockfile found") if computer.is_server_locked() else prit("No lockfile")
+                print("Lockfile found") if computer.is_server_locked() else print("No lockfile")
             else:
                 if db.get_server_state():
                     db.record_server_state(False, "Chronossrv.main verify fix")
