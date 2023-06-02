@@ -67,7 +67,7 @@ class Server():
 
     def is_server_locked(self):
         logging.debug("chronossrv: Server.is_server_locked> init")
-        status = subprocess.call(["ssh", "-i{cert}".format(cert = self.serverCert), "{usr}@{srv}".format(usr = self.serverAcc, srv = self.serverIP), "test -f {path}".format(cert = self.serverCert, usr = self.serverAcc, srv = self.serverIP, path = shlex.quote(self.serverLockfile))])
+        status = subprocess.call(["ssh", "-i{cert}".format(cert = self.serverCert), "{usr}@{srv}".format(usr = self.serverAcc, srv = self.serverIP), "test -f {path}".format(path = shlex.quote(self.serverLockfile))])
         logging.debug("chronossrv: Server.is_server_locked> sent ssh -i{cert} {usr}@{srv} test -f {path}".format(cert = self.serverCert, usr = self.serverAcc, srv = self.serverIP, path = shlex.quote(self.serverLockfile)))
         if status == 0:
             logging.info("chronossrv: Server.is_server_locked> lockfile found, returning True")
@@ -77,10 +77,22 @@ class Server():
             return False
         raise Exception('SSH failed')
 
+    def lock_server(self):
+        logging.debug("chronossrv: Server.lock_server> init")
+        status = subprocess.call(["ssh", "-i{cert}".format(cert = self.serverCert), "{usr}@{srv}".format(usr = self.serverAcc, srv = self.serverIP), "touch {path}".format(path = shlex.quote(self.serverLockfile))])
+        logging.debug("chronossrv: Server.lock_server> sent ssh -i{cert} {usr}@{srv} touch {path}".format(cert = self.serverCert, usr = self.serverAcc, srv = self.serverIP, path = shlex.quote(self.serverLockfile)))
+        if status == 0:
+            logging.info("chronossrv: Server.lock_server> lockfile created, returning True")
+            return True
+        if status == 1:
+            logging.info("chronossrv: Server.lock_server> lockfile create failed, returning False")
+            return False
+        raise Exception('SSH failed')
+
 def main(argv: List[str] = None) -> None:
     logging.debug('chronossrv: main> init.')
-    parser = argparse.ArgumentParser(description = "Control configured computer - WoL, shutdown, ping, verify.", formatter_class = argparse.ArgumentDefaultsHelpFormatter,)
-    parser.add_argument(dest = "controlArg", choices=["ping", "shutdown", "verify", "wake"], help = "wake | shutdown | ping | verify")
+    parser = argparse.ArgumentParser(description = "Control configured computer - WoL, shutdown, ping, verify, lock.", formatter_class = argparse.ArgumentDefaultsHelpFormatter,)
+    parser.add_argument(dest = "controlArg", choices=["ping", "shutdown", "verify", "wake"], help = "wake | shutdown | ping | verify | lock")
     args = parser.parse_args()
     logging.debug('chronossrv: main> arguments parsed: {a}'.format(a = args))
 
@@ -130,8 +142,14 @@ def main(argv: List[str] = None) -> None:
                     print("Server is unresponsive, DB state inconsistent, fixed")
                 else:
                     print("Server is unresponsive, DB state consistent")
+        elif args.controlArg == "lock":
+            if computer.lock_server():
+                print("Lockfile created.")
+            else:
+                print("Lockfile filed.")
         logging.debug("chronossrv: main> Closing Databaser.")
         db.close_db()
+
     else:
         print("Nothing to do.")
 
