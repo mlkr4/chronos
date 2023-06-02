@@ -162,7 +162,7 @@ def main(argv: List[str] = None) -> None:
                 else:
                     print("WoL error.")
                 loopAttempt = 0
-                loopResult = false
+                loopResult = False
                 while not loopResult or loopAttempt < 10:
                     print("Verifying server UP state, attempt: ". loopAttempt)
                     loopResult = computer.is_server_up()
