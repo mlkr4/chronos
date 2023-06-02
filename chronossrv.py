@@ -164,7 +164,7 @@ def main(argv: List[str] = None) -> None:
                 loopAttempt = 0
                 loopResult = False
                 while not loopResult or loopAttempt < 10:
-                    print("Verifying server UP state, attempt: ". loopAttempt)
+                    print("Verifying server UP state, attempt: {loopAttempt}")
                     loopResult = computer.is_server_up()
                     loopAttempt += 1
                 if not loopResult: print("Server wake failed")
