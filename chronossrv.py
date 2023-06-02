@@ -167,7 +167,7 @@ def main(argv: List[str] = None) -> None:
                     print("Verifying server UP state, attempt: ". loopAttempt)
                     loopResult = computer.is_server_up()
                     loopAttempt += 1
-                print("Server wake failed") if not loopResult == true
+                if not loopResult: print("Server wake failed")
             if computer.lock_server():
                 print("Lockfile created.")
             else:
