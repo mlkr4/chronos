@@ -92,7 +92,7 @@ class Server():
 def main(argv: List[str] = None) -> None:
     logging.debug('chronossrv: main> init.')
     parser = argparse.ArgumentParser(description = "Control configured computer - WoL, shutdown, ping, verify, lock.", formatter_class = argparse.ArgumentDefaultsHelpFormatter,)
-    parser.add_argument(dest = "controlArg", choices=["ping", "shutdown", "verify", "wake"], help = "wake | shutdown | ping | verify | lock")
+    parser.add_argument(dest = "controlArg", choices=["ping", "shutdown", "verify", "wake", "lock"], help = "wake | shutdown | ping | verify | lock")
     args = parser.parse_args()
     logging.debug('chronossrv: main> arguments parsed: {a}'.format(a = args))
 
