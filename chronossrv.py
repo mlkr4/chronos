@@ -89,10 +89,22 @@ class Server():
             return False
         raise Exception('SSH failed')
 
+    def unlock_server(self):
+        logging.debug("chronossrv: Server.unlock_server> init")
+        status = subprocess.call(["ssh", "-i{cert}".format(cert = self.serverCert), "{usr}@{srv}".format(usr = self.serverAcc, srv = self.serverIP), "rm {path}".format(path = shlex.quote(self.serverLockfile))])
+        logging.debug("chronossrv: Server.lock_server> sent ssh -i{cert} {usr}@{srv} rm {path}".format(cert = self.serverCert, usr = self.serverAcc, srv = self.serverIP, path = shlex.quote(self.serverLockfile)))
+        if status == 0:
+            logging.info("chronossrv: Server.unlock_server> lockfile removed, returning True")
+            return True
+        if status == 1:
+            logging.info("chronossrv: Server.lock_server> lockfile remove failed, returning False")
+            return False
+        raise Exception('SSH failed')
+
 def main(argv: List[str] = None) -> None:
     logging.debug('chronossrv: main> init.')
     parser = argparse.ArgumentParser(description = "Control configured computer - WoL, shutdown, ping, verify, lock.", formatter_class = argparse.ArgumentDefaultsHelpFormatter,)
-    parser.add_argument(dest = "controlArg", choices=["ping", "shutdown", "verify", "wake", "lock"], help = "wake | shutdown | ping | verify | lock")
+    parser.add_argument(dest = "controlArg", choices=["ping", "shutdown", "verify", "wake", "lock", "unlock"], help = "wake | shutdown | ping | verify | lock | unlock")
     args = parser.parse_args()
     logging.debug('chronossrv: main> arguments parsed: {a}'.format(a = args))
 
@@ -146,7 +158,12 @@ def main(argv: List[str] = None) -> None:
             if computer.lock_server():
                 print("Lockfile created.")
             else:
-                print("Lockfile filed.")
+                print("Lockfile creation failed.")
+        elif args.controlArg == "unlock":
+            if computer.unlock_server():
+                print("Lockfile removed.")
+            else:
+                print("Lockfile remove failed.")
         logging.debug("chronossrv: main> Closing Databaser.")
         db.close_db()
 
