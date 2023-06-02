@@ -155,6 +155,19 @@ def main(argv: List[str] = None) -> None:
                 else:
                     print("Server is unresponsive, DB state consistent")
         elif args.controlArg == "lock":
+            if not computer.is_server_up():
+                if computer.wake_server():
+                    print("WoL initiated.")
+                    db.record_server_state(True, "Chronossrv.main call")
+                else:
+                    print("WoL error.")
+                loopAttempt = 0
+                loopResult = false
+                while not loopResult or loopAttempt < 10:
+                    print("Verifying server UP state, attempt: ". loopAttempt)
+                    loopResult = computer.is_server_up()
+                    loopAttempt += 1
+                print("Server wake failed") if not loopResult
             if computer.lock_server():
                 print("Lockfile created.")
             else:
