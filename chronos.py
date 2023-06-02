@@ -41,6 +41,8 @@ if __name__ == '__main__':
     logging.debug("Chronos> Initializing chronostimer.Timer")
     timer = chronostimer.Timer()
 
+    ''' Not working nmap on debian causes errors in script and general chronos shenanigans. not worth it, has to be rewritten
+
     logging.debug("Chronos> calling timer.should_presence_be_got_before_poweron()")
     if timer.should_presence_be_got_before_poweron():
         logging.debug("Chronos> timer.should_presence_be_got_before_poweron() returned {a}, calling VerifyPresnece()".format(a = True))
@@ -62,7 +64,7 @@ if __name__ == '__main__':
             else:
                 logging.debug("Chronos> No PWR change based on is_server_up, !should_server_be_down, verify_home_presence(), verify_remote_presence()")
         else:
-            logging.debug("Chronos> Server lockfile count, no changes")
+            logging.debug("Chronos> Server lockfile found, no changes")
 
     else:
         logging.debug("Chronos> Server.is_server_up() returned False")
@@ -78,6 +80,27 @@ if __name__ == '__main__':
                 logging.debug("Chronos> No PWR change based on !is_server_up, !should_server_be_down and !verify_home_presence")
         else:
             logging.debug("Chronos> No PWR change based on !should_server_be_down")
+    '''
+    logging.debug("Chronos> Calling server.is_server_up()")
+
+    if server.is_server_up():
+        if timer.should_server_be_down():
+            if not server.is_server_locked():
+                logging.debug("Chronos> Server PWR down")
+                server.shutdown_server()
+                db.record_server_state(False, "Chronos: SHUTDOWN CALL by TIME")
+            else:
+                logging.debug("Chronos> Server lockfile found, no changes")
+        else:
+            logging.debug("Chronos> Server is UP, no change mandated")
+    else:
+        if not timer.should_server_be_down():
+            logging.debug("Chronos> Server PWR up")
+            server.wake_server()
+            db.record_server_state(True, "Chronos: WAKE CALL by TIME")
+        else:
+            logging.debug("Chronos> Server is DOWN, no change mandated")
+
     logging.debug("Chronos> calling Databaser.close_db()")
     db.close_db()
     logging.debug("Chronos> Fin.")
